@@ -5,42 +5,95 @@
 </head>
 
 <body>
-	
-<script>
+	<div id="content">
+		<input type="text" id="startInput" oninput="suggest('start')" />
+		<div class="suggestions" id="startSuggestions"></div>
+		<div id="results"></div>
+		<input type="text" id="endInput" oninput="suggest('end')" />
+		<div class="suggestions" id="endSuggestions"></div>
+		<button onclick="findPaths()">Compromise</button>
+	</div>
+</body>
+<script src="themoviedb.min.js"></script>
+<script type="text/javascript">
+    var targetId;
+    var startId;
+    var startOverview;
+    var targetOverview;
 
-	/*var input = ["Tony Stark. Genius, billionaire, playboy, philanthropist. Son of legendary inventor and weapons contractor Howard Stark. When Tony Stark is assigned to give a weapons presentation to an Iraqi unit led by Lt. Col. James Rhodes, he's given a ride on enemy lines. That ride ends badly when Stark's Humvee that he's riding in is attacked by enemy combatants. He survives - barely - with a chest full of shrapnel and a car battery attached to his heart. In order to survive he comes up with a way to miniaturize the battery and figures out that the battery can power something else. Thus Iron Man is born. He uses the primitive device to escape from the cave in Iraq. Once back home, he then begins work on perfecting the Iron Man suit. But the man who was put in charge of Stark Industries has plans of his own to take over Tony's technology for other matters.", 
-		
-	"When Tony Stark tries to jumpstart a dormant peacekeeping program, things go awry and Earth's Mightiest Heroes, including Iron Man, Captain America, Thor, the Incredible Hulk, Black Widow and Hawkeye, are put to the ultimate test as the fate of the planet hangs in the balance. As the villainous Ultron emerges, it is up to the Avengers to stop him from enacting his terrible plans, and soon uneasy alliances and unexpected action pave the way for a global adventure."];*/
-	
-	var input = ["Tony Stark. Genius, billionaire, playboy, philanthropist. Son of legendary inventor and weapons contractor Howard Stark. When Tony Stark is assigned to give a weapons presentation to an Iraqi unit led by Lt. Col. James Rhodes, he's given a ride on enemy lines. That ride ends badly when Stark's Humvee that he's riding in is attacked by enemy combatants. He survives - barely - with a chest full of shrapnel and a car battery attached to his heart. In order to survive he comes up with a way to miniaturize the battery and figures out that the battery can power something else. Thus Iron Man is born. He uses the primitive device to escape from the cave in Iraq. Once back home, he then begins work on perfecting the Iron Man suit. But the man who was put in charge of Stark Industries has plans of his own to take over Tony's technology for other matters.", 
-	
-	"When Tony Stark tries to jumpstart a dormant peacekeeping program, things go awry and Earth’s Mightiest Heroes are put to the ultimate test as the fate of the planet hangs in the balance. As the villainous Ultron emerges, it is up to The Avengers to stop him from enacting his terrible plans, and soon uneasy alliances and unexpected action pave the way for an epic and unique global adventure."];
+	function errorCB(data) {
+        console.log("Error callback: " + data);
+    };
 
-	var list = {"8090":"Special Agent Jennifer Marsh (Diane Lane) works in an elite division of the FBI dedicated to fighting cybercrime. She thinks she has seen it all, until a particularly sadistic criminal arises on the Internet. This tech-savvy killer posts live feeds of his crimes on his website; the more hits the site gets, the faster the victim dies. Marsh and her team must find the elusive killer before time runs out.","8834":"A man obsessed with conspiracy theories becomes a target after one of his theories turns out to be true. Unfortunately, in order to save himself, he has to figure out which theory it is.","10138":"With the world now aware of his dual life as the armored superhero Iron Man, billionaire inventor Tony Stark faces pressure from the government, the press, and the public to share his technology with the military. Unwilling to let go of his invention, Stark, along with Pepper Potts, and James \"Rhodey\" Rhodes at his side, must forge new alliances - and confront powerful enemies.","10195":"Against his father Odin's will, The Mighty Thor -a powerful but arrogant warrior god -recklessly reignites an ancient war. Thor is cast down to Earth and forced to live among humans as punishment. Once here, Thor learns what it takes to be a true hero when the most dangerous villain of his world sends the darkest forces of Asgard to invade Earth.","10528":"Eccentric consulting detective Sherlock Holmes and Doctor John Watson battle to bring down a new nemesis and unravel a deadly plot that could destroy England.","11423":"1986 Gyunggi Province. The body of a young woman is found brutally raped and murdered. Two months later, a series of rapes and murders commences under similar circumstances. And in a country that had never known such crimes, the dark whispers about a serial murderer grow louder. A special task force is set up in the area, with two local detectives Park Doo-Man and Jo Young-Goo joined by a detective from Seoul who requested to be assigned to the case."}
-	
-	var one = ["primitive", "Tony", "Howard", "James", "Man", "Stark", "suit", "enemy", "car", "enemy", "legendary", "unit", "weapons", "primitive",  "ride",  "billionaire",  "shrapnel",  "philanthropist",  "playboy",  "Genius",  "chest",  "charge",  "Son",  "cave",  "Lt",  "way",  "heart",  "home",  "work"];
-	
-	var two = ["adventure",  "program",  " Mightiest",  "Incredible",  "Tony",  "Ultron",  "Black",  "Captain",  "plans",  "action",  "Man",  "test",  "adventure",  "Thor",  "Hawkeye",  "Avengers",  "fate",  "alliances",  "balance",  "things",  "Earth"];
-	
-	var three = ["Man"];
-	
-	var scores = {};
-	
-	//scores = {"8090": 0, "8834": 0, "10138": 2, "10195": 0, "10528": 0, "11423": 0}
-	
-	console.log(mostLike(input[0], input[1], list));
-	
+    function findPaths() {
+    	var search = encodeURIComponent(document.getElementById('endInput').value);
+    	theMovieDb.search.getMovie({"query":search}, function (data) {
+    		var result = JSON.parse(data);
+    		targetId = result.results[0].id;
+    		targetOverview = result.results[0].overview;
+    		
+    		search = encodeURIComponent(document.getElementById('startInput').value);
+    		theMovieDb.search.getMovie({"query":search}, function (data) {
+	    		result = JSON.parse(data);
+	    		startId = result.results[0].id;
+	    		startOverview = result.results[0].overview;
+    			removeChildren(document.getElementById("results"));
+    			var loading = document.createElement("div");
+				var loadingText = document.createTextNode("Performing fairly arbitrary calculations...");
+    			loading.appendChild(loadingText);
+				document.getElementById("results").appendChild(loading);
+    			getSimilar(startId, targetId);
+    		}, errorCB);
+    	}, errorCB);
+    }
+
+    function getSimilar(id1, id2) {
+    	var list = {};
+		theMovieDb.movies.getSimilarMovies({"id":id1 }, function (data) {
+			var result = JSON.parse(data);
+			for(var i = 0; i < Math.min(10, result.results.length); i++) {
+				var id = result.results[i].id;
+				var overview = result.results[i].overview;
+				if(id != id2)
+					list[id] = overview;
+			}
+
+			theMovieDb.movies.getSimilarMovies({"id":id2 }, function (data) {
+				result = JSON.parse(data);
+				for(var i = 0; i < Math.min(10, result.results.length); i++) {
+					id = result.results[i].id;
+					overview = result.results[i].overview;
+					if(id != id1)
+						list[id] = overview;
+				}
+				printResult(mostLike(startOverview, targetOverview, list));
+			}, errorCB);
+		}, errorCB);
+    }
+
+    function printResult(id) {
+    	theMovieDb.movies.getById({"id":id }, function (data) {
+   			var result = JSON.parse(data);
+   			document.getElementById("results").innerHTML = result.original_title;
+   		}, errorCB);
+    }
+
+    function getBest(list) {
+    	for(var id in list) {
+    		return id;
+    	}
+    }
+
 	function mostLike(input1, input2, list) {
 		var words1 = keyWords(input1);
 		var words2 = keyWords(input2);
+		var scores = {};
 		
 		for(var key in list) {
 			if (list.hasOwnProperty(key)) {
 				list[key] = keyWords(list[key]);
 			}
 		}
-		//console.log(words1);
-		//console.log(words2);
 		
 		var max;
 		var id;
@@ -48,22 +101,16 @@
 		for(var key in list) {
 			scores[key] = compare([words1, list[key]]) + compare([words2, list[key]]);
 		}
-
-		//console.log(scores);
 		
 		var max = 0;
 		var id;
 		
 		for(var key in scores) {
-			//console.log("blarg");
-			//console.log(scores[key]);
 			if(scores[key] > max) {
 				max = scores[key];
-				//console.log(max);
 				id = key;
 			}
 		}
-		//console.log(id);
 		return id;
 	}
 	
@@ -99,16 +146,6 @@
 		
 		return keywords;
 	}
-
-
-		/*var arrays = [
-		["primitive", "Tony", "Howard", "James", "Man", "Stark", "suit", "enemy", "car", "enemy", "legendary", "unit", "weapons", "primitive",  "ride",  "billionaire",  "shrapnel",  "philanthropist",  "playboy",  "Genius",  "chest",  "charge",  "Son",  "cave",  "Lt",  "way",  "heart",  "home",  "work"],
-		["adventure",  "program",  " Mightiest",  "Incredible",  "Tony",  "Ultron",  "Black",  "Captain",  "plans",  "action",  "Man",  "test",  "adventure",  "Thor",  "Hawkeye",  "Avengers",  "fate",  "alliances",  "balance",  "things",  "Earth"]
-		];
-		
-		var arrays = [
-		keywords1, keywords2
-		]*/
 		
 	function compare(arrays) {
 		var result = arrays.shift().reduce(function(res, v) {
@@ -120,12 +157,45 @@
 		
 		return result.length;
 	}
-	
-	//console.log("outside " + common(input[0], input[1]);
-	
-	</script>
-	
 
-</body>
+   
+    function suggest(prefix) {
+    	var suggestions = document.getElementById(prefix+'Suggestions');
+    	var input = document.getElementById(prefix+'Input');
+    	while (suggestions.firstChild) {
+    		suggestions.removeChild(suggestions.firstChild);
+		}
 
+		var search = encodeURIComponent(input.value);
+		theMovieDb.search.getMovie({"query":search}, function (data) {
+			var result = JSON.parse(data);
+			for(var i = 0; i < Math.min(5, result.results.length); i++) {
+				var suggestion = document.createElement("div");
+				var suggestionText = document.createTextNode(result.results[i].original_title);
+				suggestion.appendChild(suggestionText);
+				if (suggestion.addEventListener) {
+			    	suggestion.addEventListener("click", function () {
+			    		input.value = this.innerHTML;
+			    		removeChildren(suggestions);
+			    	}, false);
+			    }
+			    else {
+			        suggestion.attachEvent('onclick', function () {
+			    		input.value = this.innerHTML;
+			    		removeChildren(suggestions);
+			    	});
+			    }
+				suggestions.appendChild(suggestion);
+			}
+		}, errorCB);
+    }
+
+
+
+    function removeChildren(element) {
+    	while (element.firstChild) {
+    		element.removeChild(element.firstChild);
+		}
+    }
+</script>
 </html>
