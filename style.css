@@ -1,0 +1,12 @@
+.entries {
+	border-style: inset;
+	border-color: red;
+	background-color: red;
+	height: 200px;
+}
+
+input {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+}
