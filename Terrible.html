@@ -8,80 +8,109 @@
 	
 <script>
 
-	var input = ["Tony Stark. Genius, billionaire, playboy, philanthropist. Son of legendary inventor and weapons contractor Howard Stark. When Tony Stark is assigned to give a weapons presentation to an Iraqi unit led by Lt. Col. James Rhodes, he's given a ride on enemy lines. That ride ends badly when Stark's Humvee that he's riding in is attacked by enemy combatants. He survives - barely - with a chest full of shrapnel and a car battery attached to his heart. In order to survive he comes up with a way to miniaturize the battery and figures out that the battery can power something else. Thus Iron Man is born. He uses the primitive device to escape from the cave in Iraq. Once back home, he then begins work on perfecting the Iron Man suit. But the man who was put in charge of Stark Industries has plans of his own to take over Tony's technology for other matters.", 
+	/*var input = ["Tony Stark. Genius, billionaire, playboy, philanthropist. Son of legendary inventor and weapons contractor Howard Stark. When Tony Stark is assigned to give a weapons presentation to an Iraqi unit led by Lt. Col. James Rhodes, he's given a ride on enemy lines. That ride ends badly when Stark's Humvee that he's riding in is attacked by enemy combatants. He survives - barely - with a chest full of shrapnel and a car battery attached to his heart. In order to survive he comes up with a way to miniaturize the battery and figures out that the battery can power something else. Thus Iron Man is born. He uses the primitive device to escape from the cave in Iraq. Once back home, he then begins work on perfecting the Iron Man suit. But the man who was put in charge of Stark Industries has plans of his own to take over Tony's technology for other matters.", 
 		
-	"When Tony Stark tries to jumpstart a dormant peacekeeping program, things go awry and Earth's Mightiest Heroes, including Iron Man, Captain America, Thor, the Incredible Hulk, Black Widow and Hawkeye, are put to the ultimate test as the fate of the planet hangs in the balance. As the villainous Ultron emerges, it is up to the Avengers to stop him from enacting his terrible plans, and soon uneasy alliances and unexpected action pave the way for a global adventure."];
-
-	function common(input1, input2) {
+	"When Tony Stark tries to jumpstart a dormant peacekeeping program, things go awry and Earth's Mightiest Heroes, including Iron Man, Captain America, Thor, the Incredible Hulk, Black Widow and Hawkeye, are put to the ultimate test as the fate of the planet hangs in the balance. As the villainous Ultron emerges, it is up to the Avengers to stop him from enacting his terrible plans, and soon uneasy alliances and unexpected action pave the way for a global adventure."];*/
 	
-//Calculating the Keywords
-		var output = encodeURIComponent(input1);
+	var input = ["Tony Stark. Genius, billionaire, playboy, philanthropist. Son of legendary inventor and weapons contractor Howard Stark. When Tony Stark is assigned to give a weapons presentation to an Iraqi unit led by Lt. Col. James Rhodes, he's given a ride on enemy lines. That ride ends badly when Stark's Humvee that he's riding in is attacked by enemy combatants. He survives - barely - with a chest full of shrapnel and a car battery attached to his heart. In order to survive he comes up with a way to miniaturize the battery and figures out that the battery can power something else. Thus Iron Man is born. He uses the primitive device to escape from the cave in Iraq. Once back home, he then begins work on perfecting the Iron Man suit. But the man who was put in charge of Stark Industries has plans of his own to take over Tony's technology for other matters.", 
+	
+	"When Tony Stark tries to jumpstart a dormant peacekeeping program, things go awry and Earth’s Mightiest Heroes are put to the ultimate test as the fate of the planet hangs in the balance. As the villainous Ultron emerges, it is up to The Avengers to stop him from enacting his terrible plans, and soon uneasy alliances and unexpected action pave the way for an epic and unique global adventure."];
+
+	var list = {"8090":"Special Agent Jennifer Marsh (Diane Lane) works in an elite division of the FBI dedicated to fighting cybercrime. She thinks she has seen it all, until a particularly sadistic criminal arises on the Internet. This tech-savvy killer posts live feeds of his crimes on his website; the more hits the site gets, the faster the victim dies. Marsh and her team must find the elusive killer before time runs out.","8834":"A man obsessed with conspiracy theories becomes a target after one of his theories turns out to be true. Unfortunately, in order to save himself, he has to figure out which theory it is.","10138":"With the world now aware of his dual life as the armored superhero Iron Man, billionaire inventor Tony Stark faces pressure from the government, the press, and the public to share his technology with the military. Unwilling to let go of his invention, Stark, along with Pepper Potts, and James \"Rhodey\" Rhodes at his side, must forge new alliances - and confront powerful enemies.","10195":"Against his father Odin's will, The Mighty Thor -a powerful but arrogant warrior god -recklessly reignites an ancient war. Thor is cast down to Earth and forced to live among humans as punishment. Once here, Thor learns what it takes to be a true hero when the most dangerous villain of his world sends the darkest forces of Asgard to invade Earth.","10528":"Eccentric consulting detective Sherlock Holmes and Doctor John Watson battle to bring down a new nemesis and unravel a deadly plot that could destroy England.","11423":"1986 Gyunggi Province. The body of a young woman is found brutally raped and murdered. Two months later, a series of rapes and murders commences under similar circumstances. And in a country that had never known such crimes, the dark whispers about a serial murderer grow louder. A special task force is set up in the area, with two local detectives Park Doo-Man and Jo Young-Goo joined by a detective from Seoul who requested to be assigned to the case."}
+	
+	var one = ["primitive", "Tony", "Howard", "James", "Man", "Stark", "suit", "enemy", "car", "enemy", "legendary", "unit", "weapons", "primitive",  "ride",  "billionaire",  "shrapnel",  "philanthropist",  "playboy",  "Genius",  "chest",  "charge",  "Son",  "cave",  "Lt",  "way",  "heart",  "home",  "work"];
+	
+	var two = ["adventure",  "program",  " Mightiest",  "Incredible",  "Tony",  "Ultron",  "Black",  "Captain",  "plans",  "action",  "Man",  "test",  "adventure",  "Thor",  "Hawkeye",  "Avengers",  "fate",  "alliances",  "balance",  "things",  "Earth"];
+	
+	var three = ["Man"];
+	
+	var scores = {};
+	
+	//scores = {"8090": 0, "8834": 0, "10138": 2, "10195": 0, "10528": 0, "11423": 0}
+	
+	console.log(mostLike(input[0], input[1], list));
+	
+	function mostLike(input1, input2, list) {
+		var words1 = keyWords(input1);
+		var words2 = keyWords(input2);
+		
+		for(var key in list) {
+			if (list.hasOwnProperty(key)) {
+				list[key] = keyWords(list[key]);
+			}
+		}
+		//console.log(words1);
+		//console.log(words2);
+		
+		var max;
+		var id;
+		
+		for(var key in list) {
+			scores[key] = compare([words1, list[key]]) + compare([words2, list[key]]);
+		}
+
+		//console.log(scores);
+		
+		var max = 0;
+		var id;
+		
+		for(var key in scores) {
+			//console.log("blarg");
+			//console.log(scores[key]);
+			if(scores[key] > max) {
+				max = scores[key];
+				//console.log(max);
+				id = key;
+			}
+		}
+		//console.log(id);
+		return id;
+	}
+	
+	function keyWords(input) {
+		var output = encodeURIComponent(input);
 	
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", "http://gateway-a.watsonplatform.net/calls/text/TextGetRankedKeywords?apikey=d79b2f182c0d4d69131506db921116ae3a044c74&text=" + output + "&outputMode=json", false);
 		xhr.send(null);
+		
+		console.log(xhr.status);
 		
 		var text = JSON.parse(xhr.responseText);
 		
-		var keywords1 = text.keywords;
+		var keywords = text.keywords;
 		
-		for(var i = 0; i < keywords1.length; i++) {
-			keywords1[i] = keywords1[i].text;
+		for(var i = 0; i < keywords.length; i++) {
+			keywords[i] = keywords[i].text;
 		}
 		
 		var counter = 0;
 		
-		while(counter < keywords1.length) {
-			if(keywords1[counter].split(" ").length > 1) {
-				var words = keywords1[counter].split(" ").length;
-				var temp = keywords1[counter].split(" ");
-				keywords1[counter] = temp[Math.floor(Math.random()*words)];
+		while(counter < keywords.length) {
+			if(keywords[counter].split(" ").length > 1) {
+				var words = keywords[counter].split(" ").length;
+				var temp = keywords[counter].split(" ");
+				keywords[counter] = temp[Math.floor(Math.random()*words)];
 			}
 			counter++;
 		}
 		
-		keywords1.sort();
-//end
+		keywords.sort();
+		
+		return keywords;
+	}
 
-//Second Keyword Calculation
-		output = encodeURIComponent(input2);
-	
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", "http://gateway-a.watsonplatform.net/calls/text/TextGetRankedKeywords?apikey=d79b2f182c0d4d69131506db921116ae3a044c74&text=" + output + "&outputMode=json", false);
-		xhr.send(null);
-
-		var text2 = JSON.parse(xhr.responseText);
-		
-		var keywords2 = text2.keywords;
-		
-		for(var i = 0; i < keywords2.length; i++) {
-			keywords2[i] = keywords2[i].text;
-		}
-		
-		var counter = 0;
-		
-		while(counter < keywords2.length) {
-			if(keywords2[counter].split(" ").length > 1) {
-				var words = keywords2[counter].split(" ").length;
-				var temp = keywords2[counter].split(" ");
-				keywords2[counter] = temp[Math.floor(Math.random()*words)];
-			}
-			counter++;
-		}
-		
-		keywords2.sort();
-//end
 
 		/*var arrays = [
 		["primitive", "Tony", "Howard", "James", "Man", "Stark", "suit", "enemy", "car", "enemy", "legendary", "unit", "weapons", "primitive",  "ride",  "billionaire",  "shrapnel",  "philanthropist",  "playboy",  "Genius",  "chest",  "charge",  "Son",  "cave",  "Lt",  "way",  "heart",  "home",  "work"],
 		["adventure",  "program",  " Mightiest",  "Incredible",  "Tony",  "Ultron",  "Black",  "Captain",  "plans",  "action",  "Man",  "test",  "adventure",  "Thor",  "Hawkeye",  "Avengers",  "fate",  "alliances",  "balance",  "things",  "Earth"]
-		];*/
+		];
 		
 		var arrays = [
 		keywords1, keywords2
-		]
+		]*/
 		
-
+	function compare(arrays) {
 		var result = arrays.shift().reduce(function(res, v) {
 			if (res.indexOf(v) === -1 && arrays.every(function(a) {
 				return a.indexOf(v) !== -1;
@@ -89,10 +118,10 @@
 			return res;
 		}, []);
 		
-		return result;
+		return result.length;
 	}
 	
-	console.log("outside " + common(input[0], input[1]));
+	//console.log("outside " + common(input[0], input[1]);
 	
 	</script>
 	
