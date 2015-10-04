@@ -1,12 +1,44 @@
+body {
+	background-image: url("movie.jpg");
+	margin: 0px;
+	padding: 0px;
+	font-family: "Comic Sans MS";
+}
+
+h1 {
+	background-color: black;
+	color: yellow;
+	margin: 0px;
+	margin-bottom: 30px;
+}
+
 .entries {
+	margin-right: auto;
+	margin-left: auto;
+	width: 50%;
 	border-style: inset;
 	border-color: red;
 	background-color: red;
 	height: 200px;
 }
 
-input {
-	display: block;
+.container {
 	margin-right: auto;
 	margin-left: auto;
+	width: 50%;
+}
+
+input {
+	margin-right: auto;
+	margin-left: auto;
+	display: block;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+button {
+	margin-right: auto;
+	margin-left: auto;
+	height: 150px;
+	width: 300px;
 }
