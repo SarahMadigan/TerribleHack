@@ -1,4 +1,6 @@
 function mostLike(input1, input2, list) {
+	var scores = {};
+	
 	var words1 = keyWords(input1);
 	var words2 = keyWords(input2);
 	
@@ -21,6 +23,7 @@ function mostLike(input1, input2, list) {
 			id = key;
 		}
 	}
+	
 	return id;
 }
 
